@@ -4,7 +4,9 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
-public class MusicService extends Service {
+import java.util.Objects;
+
+public class MusicService extends Service implements Constants {
 
 
     public IBinder onBind(Intent arg0) {
@@ -14,14 +16,25 @@ public class MusicService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        MusicManager.getInstance().initalizeMediaPlayer(this, R.raw.sephira);
-
-
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        MusicManager.getInstance().startPlaying();
+
+        switch (Objects.requireNonNull(intent.getAction())) {
+            case PLAY:
+                if (MusicManager.getInstance().player == null) {
+                    MusicManager.getInstance().initalizeMediaPlayer(this, R.raw.sephira);
+                }
+                MusicManager.getInstance().startPlaying();
+                break;
+            case STOP:
+                MusicManager.getInstance().stopPlaying();
+                stopSelf();
+                break;
+            case PAUSE:
+                MusicManager.getInstance().pausePlaying();
+        }
         return START_STICKY;
     }
 
@@ -35,3 +48,4 @@ public class MusicService extends Service {
 
     }
 }
+

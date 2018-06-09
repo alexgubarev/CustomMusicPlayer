@@ -6,7 +6,7 @@ import android.os.PowerManager;
 
 public class MusicManager {
 
-    private MediaPlayer player;
+    public MediaPlayer player;
     private static final MusicManager ourInstance = new MusicManager();
 
     public static MusicManager getInstance() {
@@ -16,22 +16,22 @@ public class MusicManager {
     private MusicManager() {
     }
 
-    public void initalizeMediaPlayer(Context context, int musicId){
+    public void initalizeMediaPlayer(Context context, int musicId) {
         player = MediaPlayer.create(context, musicId);
         player.setWakeMode(context,
                 PowerManager.PARTIAL_WAKE_LOCK);
 
     }
 
-    public void startPlaying(){
-        if (player != null){
+    public void startPlaying() {
+        if (player != null) {
             player.start();
         }
 
     }
 
-    public void stopPlaying(){
-        if (player != null){
+    public void stopPlaying() {
+        if (player != null) {
             player.stop();
             player.release();
             player = null;
@@ -39,8 +39,8 @@ public class MusicManager {
 
     }
 
-    public void pausePlaying(){
-        if (player != null){
+    public void pausePlaying() {
+        if (player != null) {
             player.pause();
         }
     }
