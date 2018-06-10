@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">CustomMusicPlayer</string>
-
+    <string name="title">My Custom Music App</string>
 </resources>

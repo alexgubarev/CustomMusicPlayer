@@ -1,5 +1,6 @@
 package ru.startandroid.custommusicplayer;
 
+import android.app.ActionBar;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -29,7 +30,8 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
         playPauseButton.setOnClickListener(this);
         stopButton.setOnClickListener(this);
 
-
+        Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.abs_layout);
     }
 
     @Override
@@ -38,14 +40,14 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
         if (MusicManager.getInstance().player != null) {
             if (MusicManager.getInstance().player.isPlaying()) {
                 playPauseButton.setActivated(true);
-                playPauseButton.setImageResource(R.drawable.pause_button);
+                playPauseButton.setImageResource(R.drawable.pause);
             } else {
                 playPauseButton.setActivated(false);
-                playPauseButton.setImageResource(R.drawable.play_button);
+                playPauseButton.setImageResource(R.drawable.play);
             }
         } else {
             playPauseButton.setActivated(false);
-            playPauseButton.setImageResource(R.drawable.play_button);
+            playPauseButton.setImageResource(R.drawable.play);
         }
 
         NotificationManager notificationManager =
@@ -69,8 +71,8 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
                 RemoteViews remoteViews = new RemoteViews(getPackageName(),
                         R.layout.custom_notification);
                 remoteViews.setImageViewResource(R.id.imageView, R.drawable.music);
-                remoteViews.setImageViewResource(R.id.stopBtnNotif, R.drawable.stop_button);
-                remoteViews.setImageViewResource(R.id.pauseBtnNotif, R.drawable.pause_button);
+                remoteViews.setImageViewResource(R.id.stopBtnNotif, R.drawable.stop);
+                remoteViews.setImageViewResource(R.id.pauseBtnNotif, R.drawable.pause);
 
 
                 Intent notificationIntent = new Intent(this, MainActivity.class);
@@ -94,14 +96,12 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
 
 
                 remoteViews.setOnClickPendingIntent(R.id.pauseBtnNotif, playPendingIntent);
-                remoteViews.setImageViewResource(R.id.pauseBtnNotif, R.drawable.pause_button);
+                remoteViews.setImageViewResource(R.id.pauseBtnNotif, R.drawable.pause);
 
                 NotificationCompat.Builder builder =
                         new NotificationCompat.Builder(this)
                                 .setContent(remoteViews)
                                 .setSmallIcon(R.mipmap.ic_launcher)
-                                .setContentTitle("Title")
-                                .setContentText("Notification text")
                                 .setContentIntent(pendingIntent);
 
                 Notification notification = builder.build();
@@ -109,10 +109,7 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
                 NotificationManager notificationManager =
                         (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                 Objects.requireNonNull(notificationManager).notify(1, notification);
-
             }
-
-
         }
 
 
@@ -147,21 +144,20 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
                 if (!playPauseButton.isActivated()) {
                     play();
                     playPauseButton.setActivated(true);
-                    playPauseButton.setImageResource(R.drawable.pause_button);
+                    playPauseButton.setImageResource(R.drawable.pause);
                 } else {
                     pause();
                     playPauseButton.setActivated(false);
-                    playPauseButton.setImageResource(R.drawable.play_button);
+                    playPauseButton.setImageResource(R.drawable.play);
                 }
                 break;
             case R.id.stopButton:
                 stop();
                 playPauseButton.setActivated(false);
-                playPauseButton.setImageResource(R.drawable.play_button);
+                playPauseButton.setImageResource(R.drawable.play);
                 break;
-
         }
-
-
     }
 }
+
+

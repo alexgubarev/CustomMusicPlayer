@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.service.notification.StatusBarNotification;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
-import android.widget.ImageButton;
 import android.widget.RemoteViews;
 
 import java.util.Objects;
@@ -39,10 +37,10 @@ public class MusicService extends Service implements Constants {
                         R.layout.custom_notification);
                 if (MusicManager.getInstance().player.isPlaying()) {
                     MusicManager.getInstance().pausePlaying();
-                    remoteViews.setImageViewResource(R.id.pauseBtnNotif, R.drawable.play_button);
+                    remoteViews.setImageViewResource(R.id.pauseBtnNotif, R.drawable.play);
                 } else {
                     MusicManager.getInstance().startPlaying();
-                    remoteViews.setImageViewResource(R.id.pauseBtnNotif, R.drawable.pause_button);
+                    remoteViews.setImageViewResource(R.id.pauseBtnNotif, R.drawable.pause);
                 }
 
                 NotificationManager notificationManager =
@@ -54,9 +52,7 @@ public class MusicService extends Service implements Constants {
                         NotificationCompat.Builder builder =
                                 new NotificationCompat.Builder(this)
                                         .setContent(remoteViews)
-                                        .setSmallIcon(R.mipmap.ic_launcher)
-                                        .setContentTitle("Title")
-                                        .setContentText("Notification text");
+                                        .setSmallIcon(R.mipmap.ic_launcher);
 
                         Notification mynotification = builder.build();
 
@@ -71,7 +67,7 @@ public class MusicService extends Service implements Constants {
                 MusicManager.getInstance().stopPlaying();
                 RemoteViews myRemoteViews = new RemoteViews(getApplicationContext().getPackageName(),
                         R.layout.custom_notification);
-                myRemoteViews.setImageViewResource(R.id.pauseBtnNotif, R.drawable.play_button);
+                myRemoteViews.setImageViewResource(R.id.pauseBtnNotif, R.drawable.play);
                 NotificationManager notificationManager1 =
                         (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
@@ -81,9 +77,7 @@ public class MusicService extends Service implements Constants {
                         NotificationCompat.Builder builder =
                                 new NotificationCompat.Builder(this)
                                         .setContent(myRemoteViews)
-                                        .setSmallIcon(R.mipmap.ic_launcher)
-                                        .setContentTitle("Title")
-                                        .setContentText("Notification text");
+                                        .setSmallIcon(R.mipmap.ic_launcher);
 
                         Notification mynotification = builder.build();
 
