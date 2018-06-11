@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
     ImageButton playPauseButton;
     ImageButton stopButton;
     Intent intent;
+    BroadcastReceiver rec;
 
 
     @Override
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
         intent = new Intent(this, MusicService.class);
 
 
-        BroadcastReceiver rec = new BroadcastReceiver() {
+        rec = new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -80,6 +81,12 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
             setButtonInPlayState(true);
         }
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(rec);
     }
 
     @Override
@@ -146,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
                 }
                 break;
             case R.id.stopButton:
-                if (MusicManager.isPlaying()){
+                if (MusicManager.isPlaying()) {
                     stop();
                     setButtonInPlayState(true);
                     break;
