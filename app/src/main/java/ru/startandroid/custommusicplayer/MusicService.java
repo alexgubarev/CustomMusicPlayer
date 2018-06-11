@@ -23,6 +23,9 @@ public class MusicService extends Service implements Constants {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        Intent broadcastIntent = new Intent(SET_BUTTON);
+        sendBroadcast(broadcastIntent);
+
         switch (Objects.requireNonNull(intent.getAction())) {
             case PLAY:
                 if (!MusicManager.isPlayerInstanceLive()) {
@@ -33,6 +36,7 @@ public class MusicService extends Service implements Constants {
                             Intent intent = new Intent(getApplicationContext(), MusicService.class);
                             intent.setAction(STOP);
                             startService(intent);
+
                         }
                     });
                 }

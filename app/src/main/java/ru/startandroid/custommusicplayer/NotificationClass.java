@@ -10,6 +10,8 @@ import android.widget.RemoteViews;
 
 import java.util.Objects;
 
+import static ru.startandroid.custommusicplayer.Constants.PLAY;
+
 public class NotificationClass {
 
     public static void createNotification(Context context, boolean isPlayState) {
@@ -30,12 +32,14 @@ public class NotificationClass {
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         Intent playIntent = new Intent(context, MusicService.class);
-        playIntent.setAction(Constants.PLAY);
+        playIntent.setAction(PLAY);
         PendingIntent playPendingIntent = PendingIntent.getService(context, 0, playIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
+
         remoteViews.setOnClickPendingIntent(R.id.stopBtnNotif, stopPendingIntent);
         remoteViews.setOnClickPendingIntent(R.id.pauseBtnNotif, playPendingIntent);
+
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(context)

@@ -2,7 +2,10 @@ package ru.startandroid.custommusicplayer;
 
 import android.app.ActionBar;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.service.notification.StatusBarNotification;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +21,7 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
     ImageButton playPauseButton;
     ImageButton stopButton;
     Intent intent;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +43,24 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
 
         intent = new Intent(this, MusicService.class);
 
+
+        BroadcastReceiver rec = new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (MusicManager.isPlayerInstanceLive()) {
+                    if (MusicManager.isPlaying()) {
+                        setButtonInPlayState(false);
+                    } else {
+                        setButtonInPlayState(true);
+                    }
+                } else setButtonInPlayState(true);
+
+            }
+        };
+
+        IntentFilter intentFilter = new IntentFilter(SET_BUTTON);
+        registerReceiver(rec, intentFilter);
     }
 
 
@@ -60,16 +82,6 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
             setButtonInPlayState(true);
         }
 
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
-        StatusBarNotification[] notifications = Objects.requireNonNull(notificationManager).getActiveNotifications();
-        for (StatusBarNotification notification : notifications) {
-            if (notification.getId() == 1) {
-                notificationManager.cancelAll();
-            }
-        }
-
     }
 
     @Override
@@ -85,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
 
     }
 
+
     private void onCompletionMethod() {
         MusicManager.getInstance().player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -92,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
                 intent.setAction(STOP);
                 startService(intent);
                 setButtonInPlayState(true);
+
 
             }
         });
@@ -111,7 +125,6 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
     public void play() {
         intent.setAction(PLAY);
         startService(intent);
-
     }
 
 
