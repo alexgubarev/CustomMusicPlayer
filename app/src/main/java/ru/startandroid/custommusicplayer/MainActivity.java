@@ -1,18 +1,15 @@
 package ru.startandroid.custommusicplayer;
 
 import android.app.ActionBar;
-import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.service.notification.StatusBarNotification;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.RemoteViews;
+
 
 import java.util.Objects;
 
@@ -20,6 +17,7 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
 
     ImageButton playPauseButton;
     ImageButton stopButton;
+    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,11 +32,12 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.abs_layout);
 
-        if (MusicManager.getInstance().player == null) {
+        if (!MusicManager.isPlayerInstanceLive()) {
             MusicManager.getInstance().initalizeMediaPlayer(this, R.raw.music);
             onCompletionMethod();
-        }
-        else onCompletionMethod();
+        } else onCompletionMethod();
+
+        intent = new Intent(this, MusicService.class);
 
     }
 
@@ -47,21 +46,18 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
     protected void onResume() {
         super.onResume();
 
-        if (MusicManager.getInstance().player != null) {
+        if (MusicManager.isPlayerInstanceLive()) {
 
             onCompletionMethod();
-            if (MusicManager.getInstance().player.isPlaying()) {
-                playPauseButton.setActivated(true);
-                playPauseButton.setImageResource(R.drawable.pause);
+            if (MusicManager.isPlaying()) {
+                setButtonInPlayState(false);
             } else {
-                playPauseButton.setActivated(false);
-                playPauseButton.setImageResource(R.drawable.play);
+                setButtonInPlayState(true);
             }
         } else {
             MusicManager.getInstance().initalizeMediaPlayer(this, R.raw.music);
             onCompletionMethod();
-            playPauseButton.setActivated(false);
-            playPauseButton.setImageResource(R.drawable.play);
+            setButtonInPlayState(true);
         }
 
         NotificationManager notificationManager =
@@ -80,49 +76,9 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
     protected void onStop() {
         super.onStop();
 
-        if (MusicManager.getInstance().player != null) {
-            if (MusicManager.getInstance().player.isPlaying()) {
-                RemoteViews remoteViews = new RemoteViews(getPackageName(),
-                        R.layout.custom_notification);
-                remoteViews.setImageViewResource(R.id.imageView, R.drawable.music);
-                remoteViews.setImageViewResource(R.id.stopBtnNotif, R.drawable.stop);
-                remoteViews.setImageViewResource(R.id.pauseBtnNotif, R.drawable.pause);
-
-
-                Intent notificationIntent = new Intent(this, MainActivity.class);
-                notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
-                        notificationIntent, 0);
-
-                Intent stopIntent = new Intent(this, MusicService.class);
-                stopIntent.setAction(Constants.STOP);
-                PendingIntent stopPendingIntent = PendingIntent.getService(this, 0, stopIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT);
-
-
-                Intent playIntent = new Intent(this, MusicService.class);
-                playIntent.setAction(Constants.PLAY);
-                PendingIntent playPendingIntent = PendingIntent.getService(this, 0, playIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT);
-
-                remoteViews.setOnClickPendingIntent(R.id.stopBtnNotif, stopPendingIntent);
-
-
-                remoteViews.setOnClickPendingIntent(R.id.pauseBtnNotif, playPendingIntent);
-                remoteViews.setImageViewResource(R.id.pauseBtnNotif, R.drawable.pause);
-
-                NotificationCompat.Builder builder =
-                        new NotificationCompat.Builder(this)
-                                .setContent(remoteViews)
-                                .setSmallIcon(R.mipmap.ic_launcher)
-                                .setContentIntent(pendingIntent);
-
-                Notification notification = builder.build();
-
-                NotificationManager notificationManager =
-                        (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                Objects.requireNonNull(notificationManager).notify(1, notification);
+        if (MusicManager.isPlayerInstanceLive()) {
+            if (MusicManager.isPlaying()) {
+                NotificationClass.createNotification(this, true);
             }
         }
 
@@ -133,36 +89,35 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
         MusicManager.getInstance().player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                Intent intent = new Intent(getApplicationContext(), MusicService.class);
                 intent.setAction(STOP);
                 startService(intent);
-                playPauseButton.setActivated(false);
-                playPauseButton.setImageResource(R.drawable.play);
+                setButtonInPlayState(true);
 
             }
         });
     }
 
-
-    public void play() {
-        Intent intent = new Intent(this, MusicService.class);
-        intent.setAction(PLAY);
-        startService(intent);
-
+    private void setButtonInPlayState(boolean setPlayState) {
+        if (setPlayState) {
+            playPauseButton.setActivated(false);
+            playPauseButton.setImageResource(R.drawable.play);
+        } else {
+            playPauseButton.setActivated(true);
+            playPauseButton.setImageResource(R.drawable.pause);
+        }
     }
 
-    public void pause() {
-        Intent intent = new Intent(this, MusicService.class);
+
+    public void play() {
         intent.setAction(PLAY);
         startService(intent);
+
     }
 
 
     public void stop() {
-        Intent intent = new Intent(this, MusicService.class);
         intent.setAction(STOP);
         startService(intent);
-
     }
 
 
@@ -173,18 +128,15 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
             case R.id.playPauseButton:
                 if (!playPauseButton.isActivated()) {
                     play();
-                    playPauseButton.setActivated(true);
-                    playPauseButton.setImageResource(R.drawable.pause);
+                    setButtonInPlayState(false);
                 } else {
-                    pause();
-                    playPauseButton.setActivated(false);
-                    playPauseButton.setImageResource(R.drawable.play);
+                    play();
+                    setButtonInPlayState(true);
                 }
                 break;
             case R.id.stopButton:
                 stop();
-                playPauseButton.setActivated(false);
-                playPauseButton.setImageResource(R.drawable.play);
+                setButtonInPlayState(true);
                 break;
         }
     }
