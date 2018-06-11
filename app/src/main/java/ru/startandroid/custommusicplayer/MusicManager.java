@@ -21,10 +21,10 @@ public class MusicManager implements Constants {
     }
 
     public static boolean isPlaying() {
-        return MusicManager.getInstance().player.isPlaying();
+        return isPlayerInstanceLive() && MusicManager.getInstance().player.isPlaying();
     }
 
-    public void initalizeMediaPlayer(final Context context, int musicId) {
+    public void initializeMediaPlayer(final Context context, int musicId) {
         player = MediaPlayer.create(context, musicId);
         player.setWakeMode(context,
                 PowerManager.PARTIAL_WAKE_LOCK);

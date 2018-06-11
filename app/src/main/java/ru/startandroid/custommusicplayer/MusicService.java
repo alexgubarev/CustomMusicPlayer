@@ -29,7 +29,7 @@ public class MusicService extends Service implements Constants {
         switch (Objects.requireNonNull(intent.getAction())) {
             case PLAY:
                 if (!MusicManager.isPlayerInstanceLive()) {
-                    MusicManager.getInstance().initalizeMediaPlayer(this, R.raw.music);
+                    MusicManager.getInstance().initializeMediaPlayer(this, R.raw.music);
                     MusicManager.getInstance().player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                         @Override
                         public void onCompletion(MediaPlayer mediaPlayer) {

@@ -1,13 +1,11 @@
 package ru.startandroid.custommusicplayer;
 
 import android.app.ActionBar;
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
-import android.service.notification.StatusBarNotification;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -37,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
         getSupportActionBar().setCustomView(R.layout.abs_layout);
 
         if (!MusicManager.isPlayerInstanceLive()) {
-            MusicManager.getInstance().initalizeMediaPlayer(this, R.raw.music);
+            MusicManager.getInstance().initializeMediaPlayer(this, R.raw.music);
             onCompletionMethod();
         } else onCompletionMethod();
 
@@ -77,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
                 setButtonInPlayState(true);
             }
         } else {
-            MusicManager.getInstance().initalizeMediaPlayer(this, R.raw.music);
+            MusicManager.getInstance().initializeMediaPlayer(this, R.raw.music);
             onCompletionMethod();
             setButtonInPlayState(true);
         }
@@ -148,9 +146,12 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
                 }
                 break;
             case R.id.stopButton:
-                stop();
-                setButtonInPlayState(true);
-                break;
+                if (MusicManager.isPlaying()){
+                    stop();
+                    setButtonInPlayState(true);
+                    break;
+                }
+
         }
     }
 }
