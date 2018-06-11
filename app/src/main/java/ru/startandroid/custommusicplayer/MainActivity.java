@@ -5,6 +5,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.service.notification.StatusBarNotification;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -32,12 +33,23 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.abs_layout);
+
+        if (MusicManager.getInstance().player == null) {
+            MusicManager.getInstance().initalizeMediaPlayer(this, R.raw.music);
+            onCompletionMethod();
+        }
+        else onCompletionMethod();
+
     }
+
 
     @Override
     protected void onResume() {
         super.onResume();
+
         if (MusicManager.getInstance().player != null) {
+
+            onCompletionMethod();
             if (MusicManager.getInstance().player.isPlaying()) {
                 playPauseButton.setActivated(true);
                 playPauseButton.setImageResource(R.drawable.pause);
@@ -46,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
                 playPauseButton.setImageResource(R.drawable.play);
             }
         } else {
+            MusicManager.getInstance().initalizeMediaPlayer(this, R.raw.music);
+            onCompletionMethod();
             playPauseButton.setActivated(false);
             playPauseButton.setImageResource(R.drawable.play);
         }
@@ -115,10 +129,26 @@ public class MainActivity extends AppCompatActivity implements Constants, View.O
 
     }
 
+    private void onCompletionMethod() {
+        MusicManager.getInstance().player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                Intent intent = new Intent(getApplicationContext(), MusicService.class);
+                intent.setAction(STOP);
+                startService(intent);
+                playPauseButton.setActivated(false);
+                playPauseButton.setImageResource(R.drawable.play);
+
+            }
+        });
+    }
+
+
     public void play() {
         Intent intent = new Intent(this, MusicService.class);
         intent.setAction(PLAY);
         startService(intent);
+
     }
 
     public void pause() {

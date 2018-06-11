@@ -2,8 +2,10 @@ package ru.startandroid.custommusicplayer;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.service.notification.StatusBarNotification;
 import android.support.v4.app.NotificationCompat;
@@ -30,17 +32,58 @@ public class MusicService extends Service implements Constants {
         switch (Objects.requireNonNull(intent.getAction())) {
             case PLAY:
                 if (MusicManager.getInstance().player == null) {
-                    MusicManager.getInstance().initalizeMediaPlayer(this, R.raw.sephira);
+                    MusicManager.getInstance().initalizeMediaPlayer(this, R.raw.music);
+                    MusicManager.getInstance().player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mediaPlayer) {
+                            Intent intent = new Intent(getApplicationContext(), MusicService.class);
+                            intent.setAction(STOP);
+                            startService(intent);
+                        }
+                    });
                 }
-
                 RemoteViews remoteViews = new RemoteViews(getApplicationContext().getPackageName(),
                         R.layout.custom_notification);
                 if (MusicManager.getInstance().player.isPlaying()) {
                     MusicManager.getInstance().pausePlaying();
                     remoteViews.setImageViewResource(R.id.pauseBtnNotif, R.drawable.play);
+                    remoteViews.setImageViewResource(R.id.imageView, R.drawable.music);
+                    remoteViews.setImageViewResource(R.id.stopBtnNotif, R.drawable.stop);
+                    Intent stopIntent = new Intent(this, MusicService.class);
+                    stopIntent.setAction(Constants.STOP);
+                    PendingIntent stopPendingIntent = PendingIntent.getService(this, 0, stopIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+                    Intent playIntent = new Intent(this, MusicService.class);
+                    playIntent.setAction(Constants.PLAY);
+                    PendingIntent playPendingIntent = PendingIntent.getService(this, 0, playIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT);
+
+                    remoteViews.setOnClickPendingIntent(R.id.stopBtnNotif, stopPendingIntent);
+
+
+                    remoteViews.setOnClickPendingIntent(R.id.pauseBtnNotif, playPendingIntent);
                 } else {
                     MusicManager.getInstance().startPlaying();
                     remoteViews.setImageViewResource(R.id.pauseBtnNotif, R.drawable.pause);
+                    remoteViews.setImageViewResource(R.id.imageView, R.drawable.music);
+                    remoteViews.setImageViewResource(R.id.stopBtnNotif, R.drawable.stop);
+                    Intent stopIntent = new Intent(this, MusicService.class);
+                    stopIntent.setAction(Constants.STOP);
+                    PendingIntent stopPendingIntent = PendingIntent.getService(this, 0, stopIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+                    Intent playIntent = new Intent(this, MusicService.class);
+                    playIntent.setAction(Constants.PLAY);
+                    PendingIntent playPendingIntent = PendingIntent.getService(this, 0, playIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT);
+
+                    remoteViews.setOnClickPendingIntent(R.id.stopBtnNotif, stopPendingIntent);
+
+
+                    remoteViews.setOnClickPendingIntent(R.id.pauseBtnNotif, playPendingIntent);
                 }
 
                 NotificationManager notificationManager =
@@ -68,6 +111,26 @@ public class MusicService extends Service implements Constants {
                 RemoteViews myRemoteViews = new RemoteViews(getApplicationContext().getPackageName(),
                         R.layout.custom_notification);
                 myRemoteViews.setImageViewResource(R.id.pauseBtnNotif, R.drawable.play);
+                myRemoteViews.setImageViewResource(R.id.imageView, R.drawable.music);
+                myRemoteViews.setImageViewResource(R.id.stopBtnNotif, R.drawable.stop);
+
+
+                Intent stopIntent = new Intent(this, MusicService.class);
+                stopIntent.setAction(Constants.STOP);
+                PendingIntent stopPendingIntent = PendingIntent.getService(this, 0, stopIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+                Intent playIntent = new Intent(this, MusicService.class);
+                playIntent.setAction(Constants.PLAY);
+                PendingIntent playPendingIntent = PendingIntent.getService(this, 0, playIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+
+                myRemoteViews.setOnClickPendingIntent(R.id.stopBtnNotif, stopPendingIntent);
+
+
+                myRemoteViews.setOnClickPendingIntent(R.id.pauseBtnNotif, playPendingIntent);
+
                 NotificationManager notificationManager1 =
                         (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 

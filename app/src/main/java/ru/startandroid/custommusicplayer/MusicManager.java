@@ -1,10 +1,12 @@
 package ru.startandroid.custommusicplayer;
 
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.PowerManager;
 
-public class MusicManager {
+public class MusicManager implements Constants {
 
     public MediaPlayer player;
     private static final MusicManager ourInstance = new MusicManager();
@@ -16,10 +18,12 @@ public class MusicManager {
     private MusicManager() {
     }
 
-    public void initalizeMediaPlayer(Context context, int musicId) {
+
+    public void initalizeMediaPlayer(final Context context, int musicId) {
         player = MediaPlayer.create(context, musicId);
         player.setWakeMode(context,
                 PowerManager.PARTIAL_WAKE_LOCK);
+
 
     }
 
@@ -44,4 +48,6 @@ public class MusicManager {
             player.pause();
         }
     }
+
+
 }
